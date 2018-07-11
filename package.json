@@ -1,5 +1,5 @@
 {
-  "name": "xy_simple",
+  "name": "xy-report-format",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -12,8 +12,8 @@
   "dependencies": {
     "cryptr": "^4.0.0",
     "docxtemplater": "^3.6.6",
-    "generate-docx": "^2.0.1",
     "jszip": "^2.6.1",
-    "mammoth": "^1.4.6"
+    "mammoth": "^1.4.6",
+    "word-extractor": "^0.1.4"
   }
 }
