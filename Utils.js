@@ -1,8 +1,6 @@
+const fs = require('fs');
 const jszip = require('jszip');
 const docxtemplater = require('docxtemplater');
-const Cryptr = require('cryptr');
-const cryptr = new Cryptr(process.env.SECRET_KEY);
-const { AUTHOR_INFO }= require('./Constants');
 
 function getDataStructure() {
     return {
@@ -15,51 +13,49 @@ function getDataStructure() {
     };
 };
 
-function getAuthorInfo(name) {
-    let info = '';
-    AUTHOR_INFO.forEach((object) => {
-        if (cryptr.decrypt(object.name) === name) {
-            info = cryptr.decrypt(object.value);
-        }
-    })
-    console.log('info = ' + info);
-    return info;
+function regex(value) {
+    return value.replace(/\s/g, '');
 };
 
-exports.getDataReforming = (rawText) => {
+exports.getReformingData = (rawText) => {
     let rawTextArray = rawText.split('\n').filter((value) => {
-        return (value !=='' && !value.match('作者簡介'));
+        return (value !== '');
     });
     console.log(rawTextArray);
 
     let data = getDataStructure();
     rawTextArray.forEach((value, index) => {
+        value = regex(value);
         switch(index) {
             case 0:
                 data.title = value;
                 break;
             case 1:
                 data.name = value;
-                data.author = getAuthorInfo(value);
                 break;
             case 2:
-                if (value.length !== 6 || !value.match('士林'))
+                if (value.length !== 6 || !value.match('士林')) {
                     data.organization = '台北士林分會';
-                else
+                } else {
                     data.organization = value;
+                }
                 break;
             case 3:
                 data.date = value;
                 break;
             default:
-                data.contents.push({content: value});
+                if (value.match('作者簡介') && value.match(data.name)) {
+                    data.author = value.slice(value.indexOf(data.name));
+                } else {
+                    data.contents.push({content: value});
+                }
                 break;
         }
     });
     console.log(data);
 
     return data;
-}
+};
 
 exports.getDocBuffer = (templateContent, data) => {
     let zip = new jszip(templateContent);
@@ -85,4 +81,4 @@ exports.getDocBuffer = (templateContent, data) => {
     let buffer = doc.getZip().generate({type: 'nodebuffer'});
 
     return buffer;
-}
+};

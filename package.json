@@ -4,14 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "npm install && node index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "cryptr": "^4.0.0",
     "docxtemplater": "^3.6.6",
+    "dotenv": "^6.0.0",
     "jszip": "^2.6.1",
     "mammoth": "^1.4.6",
     "word-extractor": "^0.1.4"

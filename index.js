@@ -1,8 +1,9 @@
+require('dotenv').load();
 const fs = require('fs');
 const path = require('path');
 const mammoth = require('mammoth');
 const wordextractor = require('word-extractor');
-const { getDataReforming, getDocBuffer } = require('./Utils');
+const { getReformingData, getDocBuffer } = require('./Utils');
 
 const INPUT_DIR = `${__dirname}/input/`;
 const OUTPUT_DIR = `${__dirname}/output/`;
@@ -19,16 +20,16 @@ fs.readdirSync(INPUT_DIR).forEach((fileName) => {
     if (fileName.match('.docx')) {
         mammoth.extractRawText({path: INPUT_DIR + fileName}).then((result) => {
             let rawText = result.value;
-            let data = getDataReforming(rawText);
+            let data = getReformingData(rawText);
             let buffer = getDocBuffer(TEMPLATE_CONTENTS, data);
             let outputFileName = `${OUTPUT_FILENAME_PRIFIX}${data.name}${OUTPUT_FILENAME_SUFFIX}.docx`;
             fs.writeFileSync(path.resolve(OUTPUT_DIR, outputFileName), buffer);
         });
-    } else {
+    } else if (fileName.match('.doc')) {
         let extractor = new wordextractor();
         extractor.extract(INPUT_DIR + fileName).then((result) => {
             let rawText = result.getBody();
-            let data = getDataReforming(rawText);
+            let data = getReformingData(rawText);
             let buffer = getDocBuffer(TEMPLATE_CONTENTS, data);
             let outputFileName = `${OUTPUT_FILENAME_PRIFIX}${data.name}${OUTPUT_FILENAME_SUFFIX}.docx`;
             fs.writeFileSync(path.resolve(OUTPUT_DIR, outputFileName), buffer);
