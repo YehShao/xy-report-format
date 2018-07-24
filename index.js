@@ -2,15 +2,23 @@ require('dotenv').load();
 const fs = require('fs');
 const path = require('path');
 const mammoth = require('mammoth');
+const xls = require('xlsx');
 const wordextractor = require('word-extractor');
 const { getReformingData, getDocBuffer } = require('./Utils');
+const NL = require('./NameListTable.js');
 
+const XLS_DIR = `${__dirname}/input/xls/NameList.xls`;
 const INPUT_DIR = `${__dirname}/input/`;
 const OUTPUT_DIR = `${__dirname}/output/`;
 const TEMPLATE_FILE_DIR = `${__dirname}/template/template.docx`;
 const OUTPUT_FILENAME_PRIFIX = process.env.OUTPUT_FILENAME_PRIFIX;
 const OUTPUT_FILENAME_SUFFIX = process.env.OUTPUT_FILENAME_SUFFIX;
 const TEMPLATE_CONTENTS = fs.readFileSync(TEMPLATE_FILE_DIR, 'binary');
+
+
+
+var exceNameList = new NL(xls.readFile(XLS_DIR).Sheets['週六晚4A']);
+var aaa = exceNameList.parseTable();
 
 // Read each input file
 fs.readdirSync(INPUT_DIR).forEach((fileName) => {
