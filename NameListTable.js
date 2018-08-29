@@ -55,10 +55,10 @@ module.exports = class NameListTable {
         var parsePoint = new Location(this.rightUpper.address())        
         this.noLocations = []
         while (this.nextByColumn(parsePoint)) {
-            if (this.sheet[parsePoint.address()] == null) {
+            if (!this.valueOf(parsePoint)) {
                 continue
             }
-            if (this.sheet[parsePoint.address()].v == 'No.') {
+            if (this.valueOf(parsePoint) == 'No.') {
                 this.noLocations.push(new Location(parsePoint.address()))
             }
         }
@@ -86,6 +86,6 @@ module.exports = class NameListTable {
             }
         })
         var result = nameRecordArray.filter(nameRecord => nameRecord.attendance)
-        return result.sort(function(a, b) { return (a.order > b.order) ? 1 : ((b.order > a.order) ? -1 : 0)})
+        return result.sort(function(a, b) { return (a.order > b.order) ? 1 : ((b.order > a.order) ? -1 : 0)}).map(x => x.studentName)
     }
 }
