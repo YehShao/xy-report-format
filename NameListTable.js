@@ -85,7 +85,6 @@ module.exports = class NameListTable {
                 nameRecordArray.push({order: num, studentName: name, attendance: att})
             }
         })
-        var result = nameRecordArray.filter(nameRecord => nameRecord.attendance)
-        return result.sort(function(a, b) { return (a.order > b.order) ? 1 : ((b.order > a.order) ? -1 : 0)}).map(x => x.studentName)
+        return nameRecordArray.filter(nameRecord => nameRecord.attendance).sort(function(a, b) { return (a.order > b.order) ? 1 : ((b.order > a.order) ? -1 : 0)}).map(x => x.studentName)
     }
 }
