@@ -14,32 +14,36 @@ const TEMPLATE_FILE_DIR = `${__dirname}/template/template.docx`;
 const OUTPUT_FILENAME_PRIFIX = process.env.OUTPUT_FILENAME_PRIFIX;
 const OUTPUT_FILENAME_SUFFIX = process.env.OUTPUT_FILENAME_SUFFIX;
 const TEMPLATE_CONTENTS = fs.readFileSync(TEMPLATE_FILE_DIR, 'binary');
-//Read the excel file to get a name array
+// Read the excel file to get a name array
 var exceNameList = new NameListTable(xls.readFile(XLS_DIR).Sheets['週六晚4A']);
 var nameArray = exceNameList.parseTable();
 // Read each input file
-var dataArray = [];
+var rawTextArray = [];
+var promiseArray = [];
 fs.readdirSync(INPUT_DIR).forEach((fileName) => {
+    // Filter out non-Word files 
     if (!fileName.match('.docx') && !fileName.match('.doc'))
         return;
+    // Prepare Word file parsing tasks
     console.log(`Input file name : ${fileName}`);
-    let test = INPUT_DIR + fileName;
-    let rawText;
+    let filePath = INPUT_DIR + fileName;
     if (fileName.match('.docx')) {
-        mammoth.extractRawText({path: test}).then((result) => {
-            rawText = result.value; 
-            dataArray.push(getReformingData(rawText));         
-        });
+        promiseArray.push(mammoth.extractRawText({path: filePath}).then((result) => {
+            rawTextArray.push(getReformingData(result.value));       
+        }));
     } else if (fileName.match('.doc')) {
         let extractor = new wordextractor();
-        extractor.extract(INPUT_DIR + fileName).then((result) => {
-            rawText = result.getBody();
-            dataArray.push(getReformingData(rawText));
-        });
+        promiseArray.push(extractor.extract(filePath).then((result) => {
+            rawTextArray.push(getReformingData(result.getBody()));
+        }));
     }
-    
 });
-
-let buffer = getDocBuffer(TEMPLATE_CONTENTS, dataArray);
-let outputFileName = `${OUTPUT_FILENAME_PRIFIX}${OUTPUT_FILENAME_SUFFIX}.docx`;
-fs.writeFileSync(path.resolve(OUTPUT_DIR, outputFileName), buffer);
+const reflect = p => p.then(v => ({v, status: "fulfilled" }),
+                            e => ({e, status: "rejected" }));
+// Wait for all promises completed, then write the output file.
+Promise.all(promiseArray.map(reflect)).then(function(values) {
+    let data = {loop: rawTextArray};
+    let buffer = getDocBuffer(TEMPLATE_CONTENTS, data);
+    let outputFileName = `${OUTPUT_FILENAME_PRIFIX}${OUTPUT_FILENAME_SUFFIX}.docx`;
+    fs.writeFileSync(path.resolve(OUTPUT_DIR, outputFileName), buffer);
+} )
