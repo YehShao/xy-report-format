@@ -11,8 +11,7 @@ const XLS_DIR = `${__dirname}/input/xls/NameList.xls`;
 const INPUT_DIR = `${__dirname}/input/`;
 const OUTPUT_DIR = `${__dirname}/output/`;
 const TEMPLATE_FILE_DIR = `${__dirname}/template/template.docx`;
-const OUTPUT_FILENAME_PRIFIX = process.env.OUTPUT_FILENAME_PRIFIX;
-const OUTPUT_FILENAME_SUFFIX = process.env.OUTPUT_FILENAME_SUFFIX;
+const OUTPUT_FILENAME = process.env.OUTPUT_FILENAME_PRIFIX + process.env.OUTPUT_FILENAME_SUFFIX + 'docx';
 const TEMPLATE_CONTENTS = fs.readFileSync(TEMPLATE_FILE_DIR, 'binary');
 // Read the excel file to get a name array
 var exceNameList = new NameListTable(xls.readFile(XLS_DIR).Sheets['週六晚4A']);
@@ -44,6 +43,5 @@ const reflect = p => p.then(v => ({v, status: "fulfilled" }),
 Promise.all(promiseArray.map(reflect)).then(function(values) {
     let data = {loop: rawTextArray};
     let buffer = getDocBuffer(TEMPLATE_CONTENTS, data);
-    let outputFileName = `${OUTPUT_FILENAME_PRIFIX}${OUTPUT_FILENAME_SUFFIX}.docx`;
-    fs.writeFileSync(path.resolve(OUTPUT_DIR, outputFileName), buffer);
+    fs.writeFileSync(path.resolve(OUTPUT_DIR, OUTPUT_FILENAME), buffer);
 } )
