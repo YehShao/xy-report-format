@@ -4,26 +4,33 @@ const docxtemplater = require('docxtemplater');
 
 function getDataStructure() {
     return {
-        title: '',
-        name: '',
-        organization: '',
-        date: '',
-        author: '',
+        fileName: '檔名',
+        title: '標題',
+        name: '姓名',
+        organization: '台北士林分會',
+        date: '日期',
+        author: '作者',
         contents: []
     };
 };
+
+exports.getDefaltDataWithName = (name) => {
+    var newData = getDataStructure();
+    newData.name = name;
+    return newData;
+}
 
 function regex(value) {
     return value.replace(/\s/g, '');
 };
 
-exports.getReformingData = (rawText) => {
+exports.getReformingData = (rawText, file) => {
     let rawTextArray = rawText.split('\n').filter((value) => {
         return (value !== '');
     });
     console.log(rawTextArray);
-
     let data = getDataStructure();
+    data.fileName = file;
     rawTextArray.forEach((value, index) => {
         value = regex(value);
         switch(index) {
