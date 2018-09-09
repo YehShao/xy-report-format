@@ -14,7 +14,7 @@ function getDataStructure() {
     };
 };
 
-exports.getDefaltDataWithName = (name) => {
+exports.getDefaultDataWithName = (name) => {
     var newData = getDataStructure();
     newData.name = name;
     return newData;
