@@ -40,8 +40,12 @@ fs.readdirSync(INPUT_DIR).forEach((fileName) => {
         }));
     }
 });
+const reflect = p => p.then(v => ({v, status: "fulfilled" }),
+                            e => ({e, status: "rejected" }));
+
 // Wait for all promises completed, then write the output file.
-Promise.all(promiseArray).then((dataArray) => {
+Promise.all(promiseArray.map(reflect)).then((completedPromiseArray) => {
+    dataArray = completedPromiseArray.filter(obj => (obj.v)).map(obj => obj.v);
     // Map and re-order dataArray with nameArray
     let nameListForWhoDidntSubmit = [];
     let dataCannotBeParsed = [];
@@ -57,8 +61,8 @@ Promise.all(promiseArray).then((dataArray) => {
             // [todo]: Log and generate name list for whose doc not in the output file.
         } else {
             sortedDataArray.push(data);
-            dataArray.shift();
-            // dataArray.splice(dataArray.indexOf(data), 1);
+            //dataArray.shift();
+            dataArray.splice(dataArray.indexOf(data), 1);
         }
     });
     let buffer = getDocBuffer(TEMPLATE_CONTENTS, { loop: sortedDataArray });
